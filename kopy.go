@@ -202,7 +202,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, logger *z
 
 		if _continue == false {
 			if fd.IsDir() {
-				if _, _, err = CopyDir(srcfp, dstfp, isLogCopiedFile, ignoreFT); err != nil {
+				if _, _, err = CopyDir(srcfp, dstfp, isLogCopiedFile, ignoreFT, logger, sugar); err != nil {
 					fmt.Println(err)
 					sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
