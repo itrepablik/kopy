@@ -6,7 +6,6 @@ import (
 	"archive/zip"
 	"compress/gzip"
 	"fmt"
-	"gokopy/itrlog"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/itrepablik/itrlog"
 
 	"go.uber.org/zap"
 )
@@ -41,10 +42,10 @@ const ComFileFormat = ".tar.gz"
 // ComSingleFileFormat use zip compression format for any single file need to be compressed.
 const ComSingleFileFormat = ".zip"
 
-func init() {
-	logger = itrlog.InitLog(BKMaxLogFileSizeInMB, BKMaxAgeLogInDays)
-	sugar = logger.Sugar()
-}
+// func init() {
+// 	// logger = itrlog.InitLog(BKMaxLogFileSizeInMB, BKMaxAgeLogInDays)
+// 	// sugar = logger.Sugar()
+// }
 
 // ComFiles compresses one or many files into a single zip archive file.
 func ComFiles(dest string, files []string) error {
@@ -300,7 +301,7 @@ func DIRCopyFiles(src, dst string) error {
 }
 
 // WalkDIRModLatest copies the latest modified files based on the modified date and time.
-func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool) error {
+func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string) error {
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
 
 	//Look for any sub sub-directories and its contents.
