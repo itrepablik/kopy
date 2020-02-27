@@ -20,21 +20,11 @@ import (
 	"go.uber.org/zap"
 )
 
-// BKMaxLogFileSizeInMB gets the max log file size value in megabytes.
-var BKMaxLogFileSizeInMB int = 100 // mb
-
-// BKMaxAgeLogInDays get the max age of a log files in days.
-var BKMaxAgeLogInDays int = 0 // 0 days means, it won't delete older backup logs
-
 // NumFilesCopied counts the number of files copied.
 var NumFilesCopied int = 0
 
 // NumFoldersCopied counts the number of folders copied.
 var NumFoldersCopied int = 0
-
-// Zap and Lumberjack logging variables.
-var logger *zap.Logger
-var sugar *zap.SugaredLogger
 
 // ComFileFormat compression file extentions.
 const ComFileFormat = ".tar.gz"
@@ -42,13 +32,8 @@ const ComFileFormat = ".tar.gz"
 // ComSingleFileFormat use zip compression format for any single file need to be compressed.
 const ComSingleFileFormat = ".zip"
 
-// func init() {
-// 	logger = itrlog.InitLog(BKMaxLogFileSizeInMB, BKMaxAgeLogInDays)
-// 	sugar = logger.Sugar()
-// }
-
 // ComFiles compresses one or many files into a single zip archive file.
-func ComFiles(dest string, files []string) error {
+func ComFiles(dest string, files []string, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	newZipFile, err := os.Create(dest)
 	if err != nil {
 		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
@@ -61,7 +46,7 @@ func ComFiles(dest string, files []string) error {
 
 	// Add files to zip
 	for _, file := range files {
-		if err = AddFileToZip(zipWriter, file); err != nil {
+		if err = AddFileToZip(zipWriter, file, logger, sugar); err != nil {
 			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			return err
 		}
@@ -70,7 +55,7 @@ func ComFiles(dest string, files []string) error {
 }
 
 // AddFileToZip where to
-func AddFileToZip(zipWriter *zip.Writer, filename string) error {
+func AddFileToZip(zipWriter *zip.Writer, filename string, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	fileToZip, err := os.Open(filename)
 	if err != nil {
 		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
@@ -214,7 +199,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, logger *z
 					}
 				}
 			} else {
-				if err = CopyFile(srcfp, dstfp, dst); err != nil {
+				if err = CopyFile(srcfp, dstfp, dst, logger, sugar); err != nil {
 					fmt.Println(err)
 					sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
@@ -232,7 +217,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, logger *z
 }
 
 // CopyFile copy a single file from the source to the destination.
-func CopyFile(src, dst, bareDst string) error {
+func CopyFile(src, dst, bareDst string, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -267,7 +252,7 @@ func CopyFile(src, dst, bareDst string) error {
 }
 
 // DIRCopyFiles copy a single file from the source to the destination.
-func DIRCopyFiles(src, dst string) error {
+func DIRCopyFiles(src, dst string, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -301,7 +286,7 @@ func DIRCopyFiles(src, dst string) error {
 }
 
 // WalkDIRModLatest copies the latest modified files based on the modified date and time.
-func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string) error {
+func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
 
 	//Look for any sub sub-directories and its contents.
@@ -353,7 +338,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 		if fModTime >= startTime && fModTime <= endTime {
 			srcFile := filepath.FromSlash(f)
 			dstBareDir := filepath.FromSlash(strings.Replace(srcFile, filepath.FromSlash(src), filepath.FromSlash(dst), -1))
-			if err = DIRCopyFiles(srcFile, dstBareDir); err != nil {
+			if err = DIRCopyFiles(srcFile, dstBareDir, logger, sugar); err != nil {
 				fmt.Println(err)
 				sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			} else {
@@ -370,7 +355,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 }
 
 // ExtractTarGz extracts the tar.gz compressed file.
-func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error {
+func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	uncompressedStream, err := gzip.NewReader(gzipStream)
 	if err != nil {
 		fmt.Println("new reader failed")
@@ -451,7 +436,7 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error 
 
 // Unzip will decompress a zip archive, moving all files and folders
 // within the zip file (parameter 1) to an output directory (parameter 2).
-func Unzip(src string, isLogCopiedFile bool) error {
+func Unzip(src string, isLogCopiedFile bool, logger *zap.Logger, sugar *zap.SugaredLogger) error {
 	// Read the compressed file's original source folder or directory.
 	zipReader, err := zip.OpenReader(src)
 
