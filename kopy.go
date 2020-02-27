@@ -43,8 +43,8 @@ const ComFileFormat = ".tar.gz"
 const ComSingleFileFormat = ".zip"
 
 // func init() {
-// 	// logger = itrlog.InitLog(BKMaxLogFileSizeInMB, BKMaxAgeLogInDays)
-// 	// sugar = logger.Sugar()
+// 	logger = itrlog.InitLog(BKMaxLogFileSizeInMB, BKMaxAgeLogInDays)
+// 	sugar = logger.Sugar()
 // }
 
 // ComFiles compresses one or many files into a single zip archive file.
@@ -166,7 +166,7 @@ func CompressDIR(src string, buf io.Writer, ignoreFT []string) error {
 }
 
 // CopyDir copies a whole directory recursively and its sub-directories.
-func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string) (int, int, error) {
+func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, logger *zap.Logger, sugar *zap.SugaredLogger) (int, int, error) {
 	var err error
 	var fds []os.FileInfo
 	var srcinfo os.FileInfo
