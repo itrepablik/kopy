@@ -199,7 +199,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *za
 					}
 				}
 			} else {
-				if err = CopyFile(srcfp, dstfp, dst, sugar); err != nil {
+				if err = CopyFile(srcfp, dstfp, sugar); err != nil {
 					fmt.Println(err)
 					sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
@@ -217,7 +217,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *za
 }
 
 // CopyFile copy a single file from the source to the destination.
-func CopyFile(src, dst, bareDst string, sugar *zap.SugaredLogger) error {
+func CopyFile(src, dst string, sugar *zap.SugaredLogger) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -230,6 +230,7 @@ func CopyFile(src, dst, bareDst string, sugar *zap.SugaredLogger) error {
 	}
 	defer srcfd.Close()
 
+	bareDst := filepath.FromSlash(filepath.Join(dst, filepath.Base(src)))
 	os.MkdirAll(bareDst, os.ModePerm) // Create the dst folder if not exist
 	if dstfd, err = os.Create(dst); err != nil {
 		fmt.Println(err)
