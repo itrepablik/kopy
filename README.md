@@ -1,4 +1,4 @@
-# kopy
+![Kopy](https://user-images.githubusercontent.com/58651329/75626348-e4b4d380-5c01-11ea-83bf-19e721932f81.png)
 The **kopy** package is the Go's common backup files operation, you can copy an entire directory or big files recursively with low CPU memory usage.  This **kopy** package fully implemented in [gokopy](https://github.com/itrepablik/gokopy) backup files software.
 
 # Installation
@@ -7,7 +7,7 @@ go get github.com/itrepablik/kopy
 ```
 
 # Usage
-To **copy** the entire directory or a folder as an example usage using the **kopy.CopyDir() method**.
+To **copy** the entire directory or a folder as an example usage using the **kopy.CopyDir()** method.
 ```
 package main
 
@@ -99,6 +99,8 @@ func main() {
 	Sugar.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
+
+To copy only the latest modified files based on the cut-off days, use the kopy.CopyMD
 
 # License
 Code is distributed under MIT license, feel free to use it in your proprietary projects as well.
