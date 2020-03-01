@@ -7,7 +7,7 @@ go get github.com/itrepablik/kopy
 ```
 
 # Usage
-To copy the entire directory or a folder as an example usage:
+To **copy** the entire directory or a folder as an example usage using the **kopy.CopyDir method**.
 ```
 package main
 
