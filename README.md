@@ -7,14 +7,51 @@ go get github.com/itrepablik/kopy
 ```
 
 # Usage
+To copy the entire directory or a folder as an example usage:
 ```
-// Starts copying the entire directory or a folder.
-  filesCopied, foldersCopied, err = kopy.CopyDir(src, dest, IsLogCopiedFile, IgnoreFT, Logger, Sugar)
-  if err != nil {
-    fmt.Println(err)
-    Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
-    return
-  }
+package main
+
+import (
+	"fmt"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	var err error
+	IgnoreFilesOrFolders := []string{".txt", ".jpg", "folder_name"}
+
+	// Example for the `kopy.CopyDir` which will copy the entire directory or a folder including its
+	// sub-folders and contents.
+	src, dst, msg := filepath.FromSlash("C:\\a"), filepath.FromSlash("C:\\b"), ""
+
+	msg = `Starts copying the entire directory or a folder: `
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	filesCopied, foldersCopied, err := kopy.CopyDir(src, dst, true, IgnoreFilesOrFolders, Sugar)
+	if err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	// Give some info back to the user's console and the logs as well.
+	msg = `Successfully copied the entire directory or a folder: `
+	fmt.Println(msg, src, ", Number of Folders Copied: ", filesCopied, " Number of Files Copied: ", foldersCopied)
+	Sugar.Infow(msg, "src", src, "dst", dst, "folder_copied", filesCopied, "files_copied", foldersCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
 ```
 
 # License
