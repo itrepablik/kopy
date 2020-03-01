@@ -29,7 +29,6 @@ func init() {
 }
 
 func main() {
-	var err error
 	IgnoreFilesOrFolders := []string{".txt", ".jpg", "folder_name"}
 
 	// Example for the `kopy.CopyDir` which will copy the entire directory or a folder including its
