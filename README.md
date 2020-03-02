@@ -270,5 +270,62 @@ func main() {
 }
 ```
 
+To **compress any single file**, use the **kopy.ComFiles** method.  It uses the **zip** file compression.
+```
+package main
+
+import (
+	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	// Use this function to auto detect file path structure.
+	src := filepath.FromSlash("C:/a/file.txt")
+	dst := filepath.FromSlash("C:/b")
+
+	// Start the process.
+	msg := `Start compressing the file:`
+	fmt.Println(msg, src)
+	Sugar.Errorw(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	// Compose the zip filename
+	fnWOext := kopy.FileNameWOExt(filepath.Base(src)) // Returns a filename without an extension.
+	zipFileName := fnWOext + ".zip"
+
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	zipDest := filepath.FromSlash(path.Join(dst, zipFileName))
+
+	// List of Files to compressed.
+	files := []string{src}
+
+	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
+	if err := kopy.ComFiles(zipDest, files, Sugar); err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	msg = `Done compressing the file:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
+```
+
 # License
 Code is distributed under MIT license, feel free to use it in your proprietary projects as well.
