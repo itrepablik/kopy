@@ -327,5 +327,47 @@ func main() {
 }
 ```
 
+To **decompress** any single **zip** file, use the **kopy.Unzip** method.
+```
+package main
+
+import (
+	"fmt"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	src := filepath.FromSlash("C:/b/file.zip")
+
+	msg := `Start decompressing the file:`
+	fmt.Println(msg, src)
+	Sugar.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	if err := kopy.Unzip(src, true, Sugar); err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	msg = `Done decompressing the file:`
+	fmt.Println(msg, src)
+	Sugar.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
+```
+
 # License
 Code is distributed under MIT license, feel free to use it in your proprietary projects as well.
