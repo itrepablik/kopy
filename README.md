@@ -7,7 +7,7 @@ go get github.com/itrepablik/kopy
 ```
 
 # Usage
-To **copy** the entire directory or a folder as an example usage using the **kopy.CopyDir()** method.
+To copy the **entire directory or a folder** as an example usage using the **kopy.CopyDir()** method.
 ```
 package main
 
@@ -148,6 +148,11 @@ func main() {
 	fmt.Println(msg, src, " Number of Files Copied: ", NumFilesCopied)
 	Sugar.Infow(msg, "src", src, "dst", dst, "copied_files", NumFilesCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
+```
+
+To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.
+```
+
 ```
 
 # License
