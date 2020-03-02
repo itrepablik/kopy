@@ -150,7 +150,7 @@ func main() {
 }
 ```
 
-To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.  It compresses the entire directory or a folder using the .tar.gz compression.
+To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.  It compresses the entire directory or a folder using the **.tar.gz** compression.
 ```
 package main
 
@@ -218,6 +218,55 @@ func main() {
 	msg = `Done compressing the directory or a folder:`
 	fmt.Println(msg, src)
 	Sugar.Infow(msg, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
+```
+
+To **decompress** the **.tar.gz** file, use the **kopy.ExtractTarGz()** method.
+```
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	src := filepath.FromSlash("C:/b/a.tar.gz")
+
+	msg := `Start decompressing the folder or a directory:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	r, err := os.Open(src)
+	if err != nil {
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		fmt.Println("error")
+		return
+	}
+	if err := kopy.ExtractTarGz(r, src, true, Sugar); err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	msg = `Done decompressing the folder or a directory:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
