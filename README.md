@@ -100,7 +100,7 @@ func main() {
 }
 ```
 
-To copy only the latest modified files based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.
+To copy only the **latest modified files** based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.
 ```
 package main
 
