@@ -85,9 +85,10 @@ func main() {
 	fmt.Println(msg, srcFile)
 	Sugar.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
-	dest := filepath.FromSlash(filepath.Join(dst, filepath.Base(srcFile)))
+	dest := filepath.FromSlash(filepath.Join(args[1], filepath.Base(src)))
+	
 	// Starts copying the single file.
-	if err := kopy.CopyFile(srcFile, dest, Sugar); err != nil {
+	if err := kopy.CopyFile(srcFile, dest, dst, Sugar); err != nil {
 		fmt.Println(err)
 		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
