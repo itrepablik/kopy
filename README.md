@@ -7,7 +7,7 @@ go get github.com/itrepablik/kopy
 ```
 
 # Usage
-To copy the **entire directory or a folder** as an example usage using the **kopy.CopyDir()** method.
+To copy the **entire directory or a folder** as an example usage using the **kopy.CopyDir()** method. This will not compress the directory or a folder.
 ```
 package main
 
@@ -53,7 +53,7 @@ func main() {
 }
 ```
 
-To **copy any single file**, use the **kopy.CopyFile()** method.
+To **copy any single file**, use the **kopy.CopyFile()** method.  This will not compress the file.
 ```
 package main
 
@@ -100,7 +100,7 @@ func main() {
 }
 ```
 
-To copy only the **latest modified files** based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.
+To copy only the **latest modified files** based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.  This will not compress the copied files.
 ```
 package main
 
@@ -150,7 +150,7 @@ func main() {
 }
 ```
 
-To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.
+To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.  It compresses the entire directory or a folder using the .tar.gz compression.
 ```
 package main
 
