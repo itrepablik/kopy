@@ -100,7 +100,55 @@ func main() {
 }
 ```
 
-To copy only the latest modified files based on the cut-off days, use the kopy.CopyMD
+To copy only the latest modified files based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.
+```
+package main
+
+import (
+	"fmt"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	NumFilesCopied := 0
+
+	// Get the list of ignored file types or entire folder name.
+	IgnoreFileTypesOrFolder := []string{".txt", ".jpg", "folder_name"}
+
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	src := filepath.FromSlash("C://a")
+	dst := filepath.FromSlash("C://b")
+
+	msg := `Starts copying the latest files from:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	// Starts copying the latest files from.
+	if err := kopy.WalkDIRModLatest(src, dst, -7, true, IgnoreFileTypesOrFolder, Sugar); err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	// Give some info back to the user's console and the logs as well.
+	msg = `Successfully copied the latest files from:`
+	fmt.Println(msg, src, " Number of Files Copied: ", NumFilesCopied)
+	Sugar.Infow(msg, "src", src, "dst", dst, "copied_files", NumFilesCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
+```
 
 # License
 Code is distributed under MIT license, feel free to use it in your proprietary projects as well.
