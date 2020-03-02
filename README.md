@@ -33,7 +33,7 @@ func main() {
 
 	// Example for the `kopy.CopyDir` which will copy the entire directory or a folder including its
 	// sub-folders and contents.
-	src, dst, msg := filepath.FromSlash("C:\\a"), filepath.FromSlash("C:\\b"), ""
+	src, dst, msg := filepath.FromSlash("C:/a"), filepath.FromSlash("C:/b"), ""
 
 	msg = `Starts copying the entire directory or a folder: `
 	fmt.Println(msg, src)
@@ -78,8 +78,8 @@ func main() {
 	// Example for kopy.CopyFile to copy single any single file only with absolute path.
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
 	// depends on the user's OS using the filepath.FromSlash organic Go's library.
-	srcFile := filepath.FromSlash("C://a//aaa.txt")
-	dst := filepath.FromSlash("C:\\b")
+	srcFile := filepath.FromSlash("C:/a/aaa.txt")
+	dst := filepath.FromSlash("C:/b")
 	msg := `Starts copying the single file:`
 
 	fmt.Println(msg, srcFile)
@@ -129,8 +129,8 @@ func main() {
 
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
 	// depends on the user's OS using the filepath.FromSlash organic Go's library.
-	src := filepath.FromSlash("C://a")
-	dst := filepath.FromSlash("C://b")
+	src := filepath.FromSlash("C:/a")
+	dst := filepath.FromSlash("C:/b")
 
 	msg := `Starts copying the latest files from:`
 	fmt.Println(msg, src)
@@ -152,7 +152,73 @@ func main() {
 
 To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.
 ```
+package main
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+	"path"
+	"path/filepath"
+	"time"
+
+	"github.com/itrepablik/itrlog"
+	"github.com/itrepablik/kopy"
+	"go.uber.org/zap"
+)
+
+// Sugar initializes the Zap and Lumberjack package
+var Sugar *zap.SugaredLogger
+
+func init() {
+	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
+}
+
+func main() {
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	src := filepath.FromSlash("C:/a")
+	dst := filepath.FromSlash("C:/b")
+	IgnoreFilesOrFolders := []string{".txt", ".jpg", "folder_name"}
+
+	msg := `Start compressing the directory or a folder:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+
+	// Compose the zip filename
+	fnWOext := kopy.FileNameWOExt(filepath.Base(src)) // Returns a filename without an extension.
+	zipDir := fnWOext + kopy.ComFileFormat
+
+	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
+	// depends on the user's OS using the filepath.FromSlash organic Go's library.
+	zipDest := filepath.FromSlash(path.Join(dst, zipDir))
+
+	// Start compressing the entire directory or a folder using the tar + gzip
+	var buf bytes.Buffer
+	if err := kopy.CompressDIR(src, &buf, IgnoreFilesOrFolders); err != nil {
+		fmt.Println(err)
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		return
+	}
+
+	// write the .tar.gzip
+	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
+	fileToWrite, err := os.OpenFile(zipDest, os.O_CREATE|os.O_RDWR, os.FileMode(600))
+	if err != nil {
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		panic(err)
+	}
+	if _, err := io.Copy(fileToWrite, &buf); err != nil {
+		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		panic(err)
+	}
+	defer fileToWrite.Close()
+
+	msg = `Done compressing the directory or a folder:`
+	fmt.Println(msg, src)
+	Sugar.Infow(msg, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+}
 ```
 
 # License
