@@ -3,7 +3,7 @@ The **kopy** package is the Go's common backup files operation, you can copy an 
 
 # Installation
 ```
-go get github.com/itrepablik/kopy
+go get -u github.com/itrepablik/kopy
 ```
 
 # Usage
