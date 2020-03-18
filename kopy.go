@@ -16,8 +16,6 @@ import (
 	"time"
 
 	"github.com/itrepablik/itrlog"
-
-	"go.uber.org/zap"
 )
 
 // NumFilesCopied counts the number of files copied.
@@ -33,7 +31,7 @@ const ComFileFormat = ".tar.gz"
 const ComSingleFileFormat = ".zip"
 
 // ComFiles compresses one or many files into a single zip archive file.
-func ComFiles(dest string, files []string, sugar *zap.SugaredLogger) error {
+func ComFiles(dest string, files []string, sugar *itrlog.ITRLogger) error {
 	newZipFile, err := os.Create(dest)
 	if err != nil {
 		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
@@ -55,7 +53,7 @@ func ComFiles(dest string, files []string, sugar *zap.SugaredLogger) error {
 }
 
 // AddFileToZip where to
-func AddFileToZip(zipWriter *zip.Writer, filename string, sugar *zap.SugaredLogger) error {
+func AddFileToZip(zipWriter *zip.Writer, filename string, sugar *itrlog.ITRLogger) error {
 	fileToZip, err := os.Open(filename)
 	if err != nil {
 		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
@@ -151,7 +149,7 @@ func CompressDIR(src string, buf io.Writer, ignoreFT []string) error {
 }
 
 // CopyDir copies a whole directory recursively and its sub-directories.
-func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *zap.SugaredLogger) (int, int, error) {
+func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) (int, int, error) {
 	var err error
 	var fds []os.FileInfo
 	var srcinfo os.FileInfo
@@ -217,7 +215,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *za
 }
 
 // CopyFile copy a single file from the source to the destination.
-func CopyFile(src, dst, bareDst string, sugar *zap.SugaredLogger) error {
+func CopyFile(src, dst, bareDst string, sugar *itrlog.ITRLogger) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -252,7 +250,7 @@ func CopyFile(src, dst, bareDst string, sugar *zap.SugaredLogger) error {
 }
 
 // DIRCopyFiles copy a single file from the source to the destination.
-func DIRCopyFiles(src, dst string, sugar *zap.SugaredLogger) error {
+func DIRCopyFiles(src, dst string, sugar *itrlog.ITRLogger) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -286,7 +284,7 @@ func DIRCopyFiles(src, dst string, sugar *zap.SugaredLogger) error {
 }
 
 // WalkDIRModLatest copies the latest modified files based on the modified date and time.
-func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string, sugar *zap.SugaredLogger) error {
+func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) error {
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
 
 	//Look for any sub sub-directories and its contents.
@@ -355,7 +353,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 }
 
 // ExtractTarGz extracts the tar.gz compressed file.
-func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar *zap.SugaredLogger) error {
+func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 	uncompressedStream, err := gzip.NewReader(gzipStream)
 	if err != nil {
 		fmt.Println("new reader failed")
@@ -436,7 +434,7 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar 
 
 // Unzip will decompress a zip archive, moving all files and folders
 // within the zip file (parameter 1) to an output directory (parameter 2).
-func Unzip(src string, isLogCopiedFile bool, sugar *zap.SugaredLogger) error {
+func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 	// Read the compressed file's original source folder or directory.
 	zipReader, err := zip.OpenReader(src)
 
