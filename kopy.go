@@ -321,7 +321,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 	}
 
 	// Create all the folder structures first before any files will be added later.
-	for p, _ := range folders {
+	for p := range folders {
 		srcFile := filepath.FromSlash(p)
 		dstBareDir := filepath.FromSlash(strings.Replace(srcFile, src, dst, -1))
 		os.MkdirAll(dstBareDir, os.ModePerm) // Create the dst folder if not exist
@@ -534,7 +534,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 	for _, f := range files {
 		ff, err1 := os.Stat(f)
 		if err1 != nil {
-			Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 
 		fModTime := ff.ModTime().Unix()
@@ -547,13 +547,13 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 			// Delete the older backup file now
 			errRemove := os.Remove(srcFile)
 			if errRemove != nil {
-				Sugar.Errorw("error", "err", errRemove, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				sugar.Errorw("error", "err", errRemove, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				continue
 			}
 			NumDeletedFiles++
 			// Only log when it's true
 			if logCopiedFile {
-				Sugar.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				sugar.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				fmt.Println("deleted file: ", srcFile)
 			}
 		}
