@@ -24,6 +24,9 @@ var NumFilesCopied int = 0
 // NumFoldersCopied counts the number of folders copied.
 var NumFoldersCopied int = 0
 
+// NumDeletedFiles counts the number of files deleted.
+var NumDeletedFiles int = 0
+
 // ComFileFormat compression file extentions.
 const ComFileFormat = ".tar.gz"
 
@@ -497,4 +500,63 @@ func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 		}
 	}
 	return err
+}
+
+// DeleteFilesWithRetention deletes the files from the specified source folder or directory
+func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) (int, error) {
+	//Look for any sub sub-directories and its contents.
+	var files []string
+	var startTime int64 = time.Now().AddDate(0, 0, modDays).Unix() // Behind "x" days modified date and time to start the delete operation.
+	var endTime int64 = time.Now().Unix()                          // Current date and time
+	var err error
+
+	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		_continue := false
+		for _, i := range ignoreFT {
+			if strings.Index(path, strings.TrimSpace(i)) != -1 {
+				_continue = true // Loop : ignore files and folders here.
+			}
+		}
+
+		if _continue == false {
+			if !info.IsDir() {
+				files = append(files, path)
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
+	// Delete any single files matching the retention in specified days old.
+	for _, f := range files {
+		ff, err1 := os.Stat(f)
+		if err1 != nil {
+			Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		}
+
+		fModTime := ff.ModTime().Unix()
+		if fModTime >= startTime && fModTime <= endTime {
+			continue
+		} else {
+			// Remove the rest of the old backup files here
+			srcFile := filepath.FromSlash(f)
+
+			// Delete the older backup file now
+			errRemove := os.Remove(srcFile)
+			if errRemove != nil {
+				Sugar.Errorw("error", "err", errRemove, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				continue
+			}
+			NumDeletedFiles++
+			// Only log when it's true
+			if logCopiedFile {
+				Sugar.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				fmt.Println("deleted file: ", srcFile)
+			}
+		}
+	}
+	return NumDeletedFiles, err
 }
