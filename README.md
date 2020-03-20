@@ -21,8 +21,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -67,8 +67,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -115,8 +115,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -169,8 +169,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -237,8 +237,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -287,8 +287,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
@@ -342,8 +342,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar initializes the Zap and Lumberjack package
-var Sugar *zap.SugaredLogger
+// Sugar type is the *itrlog.ITRLogger initialization
+var Sugar *itrlog.ITRLogger
 
 func init() {
 	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
