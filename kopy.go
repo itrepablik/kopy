@@ -509,6 +509,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 	var startTime int64 = time.Now().AddDate(0, 0, modDays).Unix() // Behind "x" days modified date and time to start the delete operation.
 	var endTime int64 = time.Now().Unix()                          // Current date and time
 	var err error
+	NumDeletedFiles = 0
 
 	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		_continue := false
@@ -534,7 +535,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 	for _, f := range files {
 		ff, err1 := os.Stat(f)
 		if err1 != nil {
-			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			continue
 		}
 
 		fModTime := ff.ModTime().Unix()
@@ -547,7 +548,6 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 			// Delete the older backup file now
 			errRemove := os.Remove(srcFile)
 			if errRemove != nil {
-				sugar.Errorw("error", "err", errRemove, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				continue
 			}
 			NumDeletedFiles++
