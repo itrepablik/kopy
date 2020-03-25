@@ -18,15 +18,7 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
-
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
 
 func main() {
 	IgnoreFilesOrFolders := []string{".txt", ".jpg", "folder_name"}
@@ -37,19 +29,19 @@ func main() {
 
 	msg = `Starts copying the entire directory or a folder: `
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
-	filesCopied, foldersCopied, err := kopy.CopyDir(src, dst, true, IgnoreFilesOrFolders, Sugar)
+	filesCopied, foldersCopied, err := kopy.CopyDir(src, dst, true, IgnoreFilesOrFolders)
 	if err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	// Give some info back to the user's console and the logs as well.
 	msg = `Successfully copied the entire directory or a folder: `
 	fmt.Println(msg, src, ", Number of Folders Copied: ", filesCopied, " Number of Files Copied: ", foldersCopied)
-	Sugar.Infow(msg, "src", src, "dst", dst, "folder_copied", filesCopied, "files_copied", foldersCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "dst", dst, "folder_copied", filesCopied, "files_copied", foldersCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -67,13 +59,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	// Example for kopy.CopyFile to copy single any single file only with absolute path.
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
@@ -83,21 +68,21 @@ func main() {
 	msg := `Starts copying the single file:`
 
 	fmt.Println(msg, srcFile)
-	Sugar.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
 	dest := filepath.FromSlash(filepath.Join(args[1], filepath.Base(src)))
 	
 	// Starts copying the single file.
-	if err := kopy.CopyFile(srcFile, dest, dst, Sugar); err != nil {
+	if err := kopy.CopyFile(srcFile, dest, dst); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	// Give some info back to the user's console and the logs as well.
 	msg = `Successfully copied the file:`
 	fmt.Println(msg, srcFile)
-	Sugar.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "srcFile", srcFile, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -115,13 +100,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	NumFilesCopied := 0
 
@@ -135,19 +113,19 @@ func main() {
 
 	msg := `Starts copying the latest files from:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
 	// Starts copying the latest files from.
-	if err := kopy.WalkDIRModLatest(src, dst, -7, true, IgnoreFileTypesOrFolder, Sugar); err != nil {
+	if err := kopy.WalkDIRModLatest(src, dst, -7, true, IgnoreFileTypesOrFolder); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	// Give some info back to the user's console and the logs as well.
 	msg = `Successfully copied the latest files from:`
 	fmt.Println(msg, src, " Number of Files Copied: ", NumFilesCopied)
-	Sugar.Infow(msg, "src", src, "dst", dst, "copied_files", NumFilesCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "dst", dst, "copied_files", NumFilesCopied, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -169,13 +147,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
 	// depends on the user's OS using the filepath.FromSlash organic Go's library.
@@ -185,7 +156,7 @@ func main() {
 
 	msg := `Start compressing the directory or a folder:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
 	// Compose the zip filename
 	fnWOext := kopy.FileNameWOExt(filepath.Base(src)) // Returns a filename without an extension.
@@ -199,7 +170,7 @@ func main() {
 	var buf bytes.Buffer
 	if err := kopy.CompressDIR(src, &buf, IgnoreFilesOrFolders); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
@@ -207,18 +178,18 @@ func main() {
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
 	fileToWrite, err := os.OpenFile(zipDest, os.O_CREATE|os.O_RDWR, os.FileMode(600))
 	if err != nil {
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		panic(err)
 	}
 	if _, err := io.Copy(fileToWrite, &buf); err != nil {
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		panic(err)
 	}
 	defer fileToWrite.Close()
 
 	msg = `Done compressing the directory or a folder:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -237,13 +208,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
 	// depends on the user's OS using the filepath.FromSlash organic Go's library.
@@ -251,23 +215,23 @@ func main() {
 
 	msg := `Start decompressing the folder or a directory:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
 	r, err := os.Open(src)
 	if err != nil {
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		fmt.Println("error")
 		return
 	}
-	if err := kopy.ExtractTarGz(r, src, true, Sugar); err != nil {
+	if err := kopy.ExtractTarGz(r, src, true); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	msg = `Done decompressing the folder or a directory:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -287,13 +251,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	// Use this function to auto detect file path structure.
 	src := filepath.FromSlash("C:/a/file.txt")
@@ -302,7 +259,7 @@ func main() {
 	// Start the process.
 	msg := `Start compressing the file:`
 	fmt.Println(msg, src)
-	Sugar.Errorw(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Errorw(msg, "src", src, "dst", dst, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
 	// Compose the zip filename
 	fnWOext := kopy.FileNameWOExt(filepath.Base(src)) // Returns a filename without an extension.
@@ -316,15 +273,15 @@ func main() {
 	files := []string{src}
 
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
-	if err := kopy.ComFiles(zipDest, files, Sugar); err != nil {
+	if err := kopy.ComFiles(zipDest, files); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	msg = `Done compressing the file:`
 	fmt.Println(msg, src)
-	Sugar.Infow(msg, "src", src, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Infow(msg, "src", src, "dst", zipDest, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
@@ -342,13 +299,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Sugar type is the *itrlog.ITRLogger initialization
-var Sugar *itrlog.ITRLogger
-
-func init() {
-	Sugar = itrlog.InitLog(50, 90, "logs", "test_copy_")
-}
-
 func main() {
 	// To make directory path separator a universal, in Linux "/" and in Windows "\" to auto change
 	// depends on the user's OS using the filepath.FromSlash organic Go's library.
@@ -356,17 +306,17 @@ func main() {
 
 	msg := `Start decompressing the file:`
 	fmt.Println(msg, src)
-	Sugar.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 
-	if err := kopy.Unzip(src, true, Sugar); err != nil {
+	if err := kopy.Unzip(src, true); err != nil {
 		fmt.Println(err)
-		Sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return
 	}
 
 	msg = `Done decompressing the file:`
 	fmt.Println(msg, src)
-	Sugar.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+	itrlog.Errorw(msg, "src", src, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 }
 ```
 
