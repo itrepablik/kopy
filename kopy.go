@@ -34,10 +34,10 @@ const ComFileFormat = ".tar.gz"
 const ComSingleFileFormat = ".zip"
 
 // ComFiles compresses one or many files into a single zip archive file.
-func ComFiles(dest string, files []string, sugar *itrlog.ITRLogger) error {
+func ComFiles(dest string, files []string) error {
 	newZipFile, err := os.Create(dest)
 	if err != nil {
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer newZipFile.Close()
@@ -47,8 +47,8 @@ func ComFiles(dest string, files []string, sugar *itrlog.ITRLogger) error {
 
 	// Add files to zip
 	for _, file := range files {
-		if err = AddFileToZip(zipWriter, file, sugar); err != nil {
-			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		if err = AddFileToZip(zipWriter, file); err != nil {
+			itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			return err
 		}
 	}
@@ -56,10 +56,10 @@ func ComFiles(dest string, files []string, sugar *itrlog.ITRLogger) error {
 }
 
 // AddFileToZip where to
-func AddFileToZip(zipWriter *zip.Writer, filename string, sugar *itrlog.ITRLogger) error {
+func AddFileToZip(zipWriter *zip.Writer, filename string) error {
 	fileToZip, err := os.Open(filename)
 	if err != nil {
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer fileToZip.Close()
@@ -67,13 +67,13 @@ func AddFileToZip(zipWriter *zip.Writer, filename string, sugar *itrlog.ITRLogge
 	// Get the file information
 	info, err := fileToZip.Stat()
 	if err != nil {
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 
@@ -87,7 +87,7 @@ func AddFileToZip(zipWriter *zip.Writer, filename string, sugar *itrlog.ITRLogge
 
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 
@@ -152,26 +152,26 @@ func CompressDIR(src string, buf io.Writer, ignoreFT []string) error {
 }
 
 // CopyDir copies a whole directory recursively and its sub-directories.
-func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) (int, int, error) {
+func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string) (int, int, error) {
 	var err error
 	var fds []os.FileInfo
 	var srcinfo os.FileInfo
 
 	if srcinfo, err = os.Stat(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
 
 	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
 
 	if fds, err = ioutil.ReadDir(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
 
@@ -188,26 +188,26 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *it
 
 		if _continue == false {
 			if fd.IsDir() {
-				if _, _, err = CopyDir(srcfp, dstfp, isLogCopiedFile, ignoreFT, sugar); err != nil {
+				if _, _, err = CopyDir(srcfp, dstfp, isLogCopiedFile, ignoreFT); err != nil {
 					fmt.Println(err)
-					sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+					itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
 					NumFoldersCopied++
 					// Only log when it's true
 					if isLogCopiedFile {
-						sugar.Infow("copied_folder", "name", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+						itrlog.Infow("copied_folder", "name", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 						fmt.Println("copied folder: ", fd.Name())
 					}
 				}
 			} else {
-				if err = CopyFile(srcfp, dstfp, dst, sugar); err != nil {
+				if err = CopyFile(srcfp, dstfp, dst); err != nil {
 					fmt.Println(err)
-					sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+					itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
 					NumFilesCopied++
 					// Only log when it's true
 					if isLogCopiedFile {
-						sugar.Infow("copied_file", "file", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+						itrlog.Infow("copied_file", "file", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 						fmt.Println("copied file: ", fd.Name())
 					}
 				}
@@ -218,7 +218,7 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string, sugar *it
 }
 
 // CopyFile copy a single file from the source to the destination.
-func CopyFile(src, dst, bareDst string, sugar *itrlog.ITRLogger) error {
+func CopyFile(src, dst, bareDst string) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -226,7 +226,7 @@ func CopyFile(src, dst, bareDst string, sugar *itrlog.ITRLogger) error {
 
 	if srcfd, err = os.Open(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer srcfd.Close()
@@ -234,26 +234,26 @@ func CopyFile(src, dst, bareDst string, sugar *itrlog.ITRLogger) error {
 	os.MkdirAll(bareDst, os.ModePerm) // Create the bareDst folder if not exist
 	if dstfd, err = os.Create(dst); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer dstfd.Close()
 
 	if _, err = io.Copy(dstfd, srcfd); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	if srcinfo, err = os.Stat(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	return os.Chmod(dst, srcinfo.Mode())
 }
 
 // DIRCopyFiles copy a single file from the source to the destination.
-func DIRCopyFiles(src, dst string, sugar *itrlog.ITRLogger) error {
+func DIRCopyFiles(src, dst string) error {
 	var err error
 	var srcfd *os.File
 	var dstfd *os.File
@@ -261,33 +261,33 @@ func DIRCopyFiles(src, dst string, sugar *itrlog.ITRLogger) error {
 
 	if srcfd, err = os.Open(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer srcfd.Close()
 
 	if dstfd, err = os.Create(dst); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer dstfd.Close()
 
 	if _, err = io.Copy(dstfd, srcfd); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	if srcinfo, err = os.Stat(src); err != nil {
 		fmt.Println(err)
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	return os.Chmod(dst, srcinfo.Mode())
 }
 
 // WalkDIRModLatest copies the latest modified files based on the modified date and time.
-func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) error {
+func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT []string) error {
 	os.MkdirAll(dst, os.ModePerm) // Create the root folder first
 
 	//Look for any sub sub-directories and its contents.
@@ -331,7 +331,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 	for _, f := range files {
 		ff, err1 := os.Stat(f)
 		if err1 != nil {
-			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			fmt.Println(err1)
 		}
 		fModTime := ff.ModTime().Unix()
@@ -339,15 +339,15 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 		if fModTime >= startTime && fModTime <= endTime {
 			srcFile := filepath.FromSlash(f)
 			dstBareDir := filepath.FromSlash(strings.Replace(srcFile, filepath.FromSlash(src), filepath.FromSlash(dst), -1))
-			if err = DIRCopyFiles(srcFile, dstBareDir, sugar); err != nil {
+			if err = DIRCopyFiles(srcFile, dstBareDir); err != nil {
 				fmt.Println(err)
-				sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			} else {
 				NumFilesCopied++
 				// Only log when it's true
 				if logCopiedFile {
 					fmt.Println("copied file: ", ff.Name())
-					sugar.Errorw("copied_file", "name", ff.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+					itrlog.Errorw("copied_file", "name", ff.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				}
 			}
 		}
@@ -356,11 +356,11 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 }
 
 // ExtractTarGz extracts the tar.gz compressed file.
-func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
+func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error {
 	uncompressedStream, err := gzip.NewReader(gzipStream)
 	if err != nil {
 		fmt.Println("new reader failed")
-		sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 	}
 
 	tarReader := tar.NewReader(uncompressedStream)
@@ -377,7 +377,7 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar 
 		}
 		if err != nil {
 			fmt.Println(err.Error())
-			sugar.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			log.Fatalf(err.Error())
 		}
 
@@ -397,7 +397,7 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar 
 			}
 			if err := os.MkdirAll(filepath.FromSlash(extractFileTo), os.ModePerm); err != nil {
 				fmt.Println(err.Error())
-				sugar.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				log.Fatalf(err.Error())
 			}
 		case tar.TypeReg:
@@ -413,23 +413,23 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar 
 			outFile, err := os.Create(extractFileTo)
 			if err != nil {
 				fmt.Println(err.Error())
-				sugar.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				log.Fatalf(err.Error())
 			}
 			if _, err := io.Copy(outFile, tarReader); err != nil {
 				fmt.Println(err.Error())
-				sugar.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				log.Fatalf(err.Error())
 			}
 			// Only log when it's true
 			if isLogCopiedFile {
 				fmt.Println("extracting to: ", extractFileTo)
-				sugar.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			defer outFile.Close()
 		default:
 			fmt.Println("unknown type:", filepath.FromSlash(header.Name))
-			sugar.Errorw("unknown type", "file_type", filepath.FromSlash(header.Name), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			itrlog.Errorw("unknown type", "file_type", filepath.FromSlash(header.Name), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 	}
 	return err
@@ -437,7 +437,7 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool, sugar 
 
 // Unzip will decompress a zip archive, moving all files and folders
 // within the zip file (parameter 1) to an output directory (parameter 2).
-func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
+func Unzip(src string, isLogCopiedFile bool) error {
 	// Read the compressed file's original source folder or directory.
 	zipReader, err := zip.OpenReader(src)
 
@@ -451,7 +451,7 @@ func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 		zippedFile, err := file.Open()
 		if err != nil {
 			fmt.Println(err)
-			sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+			itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 		defer zippedFile.Close()
 
@@ -467,7 +467,7 @@ func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 		if file.FileInfo().IsDir() {
 			if err := os.MkdirAll(filepath.FromSlash(extractedFilePath), os.ModePerm); err != nil {
 				fmt.Println(err.Error())
-				sugar.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				log.Fatalf(err.Error())
 			}
 		} else {
@@ -482,20 +482,20 @@ func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 
 			if err != nil {
 				fmt.Println(err)
-				sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			defer outputFile.Close()
 
 			if _, err = io.Copy(outputFile, zippedFile); err != nil {
 				fmt.Println(err)
-				sugar.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				return err
 			}
 
 			// Only log when it's true
 			if isLogCopiedFile {
 				fmt.Println("extracting to: ", extractFileTo)
-				sugar.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 		}
 	}
@@ -503,7 +503,7 @@ func Unzip(src string, isLogCopiedFile bool, sugar *itrlog.ITRLogger) error {
 }
 
 // DeleteFilesWithRetention deletes the files from the specified source folder or directory
-func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignoreFT []string, sugar *itrlog.ITRLogger) (int, error) {
+func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignoreFT []string) (int, error) {
 	//Look for any sub sub-directories and its contents.
 	var files []string
 	var startTime int64 = time.Now().AddDate(0, 0, modDays).Unix() // Behind "x" days modified date and time to start the delete operation.
@@ -553,7 +553,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 			NumDeletedFiles++
 			// Only log when it's true
 			if logCopiedFile {
-				sugar.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
+				itrlog.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				fmt.Println("deleted file: ", srcFile)
 			}
 		}
