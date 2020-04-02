@@ -512,6 +512,10 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 	NumDeletedFiles = 0
 
 	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Println(err)
+			itrlog.Fatal(err)
+		}
 		_continue := false
 		for _, i := range ignoreFT {
 			if strings.Index(path, strings.TrimSpace(i)) != -1 {
