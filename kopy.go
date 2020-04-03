@@ -513,8 +513,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 
 	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Println(err)
-			itrlog.Fatal(err)
+			return err
 		}
 		_continue := false
 		for _, i := range ignoreFT {
@@ -530,10 +529,6 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 		}
 		return nil
 	})
-
-	if err != nil {
-		panic(err)
-	}
 
 	// Delete any single files matching the retention in specified days old.
 	for _, f := range files {
