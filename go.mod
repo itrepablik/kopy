@@ -1,6 +1,6 @@
 module github.com/itrepablik/kopy
 
-go 1.13
+go 1.14
 
 require (
 	github.com/itrepablik/itrlog v0.0.0-20200228061119-ddc0848e8196
