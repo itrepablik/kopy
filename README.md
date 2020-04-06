@@ -56,7 +56,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -97,7 +96,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -144,7 +142,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -205,7 +202,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -248,7 +244,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -296,7 +291,6 @@ import (
 
 	"github.com/itrepablik/itrlog"
 	"github.com/itrepablik/kopy"
-	"go.uber.org/zap"
 )
 
 func main() {
