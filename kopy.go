@@ -5,16 +5,15 @@ import (
 	"archive/tar"
 	"archive/zip"
 	"compress/gzip"
-	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/itrepablik/itrlog"
 )
 
@@ -158,19 +157,19 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string) (int, int
 	var srcinfo os.FileInfo
 
 	if srcinfo, err = os.Stat(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
 
 	if err = os.MkdirAll(dst, srcinfo.Mode()); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
 
 	if fds, err = ioutil.ReadDir(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return int(NumFoldersCopied), int(NumFilesCopied), err
 	}
@@ -189,26 +188,26 @@ func CopyDir(src, dst string, isLogCopiedFile bool, ignoreFT []string) (int, int
 		if _continue == false {
 			if fd.IsDir() {
 				if _, _, err = CopyDir(srcfp, dstfp, isLogCopiedFile, ignoreFT); err != nil {
-					fmt.Println(err)
+					color.Red(err.Error())
 					itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
 					NumFoldersCopied++
 					// Only log when it's true
 					if isLogCopiedFile {
 						itrlog.Infow("copied_folder", "name", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-						fmt.Println("copied folder: ", fd.Name())
+						color.Magenta("copied folder: " + fd.Name())
 					}
 				}
 			} else {
 				if err = CopyFile(srcfp, dstfp, dst); err != nil {
-					fmt.Println(err)
+					color.Red(err.Error())
 					itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				} else {
 					NumFilesCopied++
 					// Only log when it's true
 					if isLogCopiedFile {
 						itrlog.Infow("copied_file", "file", fd.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-						fmt.Println("copied file: ", fd.Name())
+						color.Magenta("copied file: " + fd.Name())
 					}
 				}
 			}
@@ -225,7 +224,7 @@ func CopyFile(src, dst, bareDst string) error {
 	var srcinfo os.FileInfo
 
 	if srcfd, err = os.Open(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
@@ -233,19 +232,19 @@ func CopyFile(src, dst, bareDst string) error {
 
 	os.MkdirAll(bareDst, os.ModePerm) // Create the bareDst folder if not exist
 	if dstfd, err = os.Create(dst); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer dstfd.Close()
 
 	if _, err = io.Copy(dstfd, srcfd); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	if srcinfo, err = os.Stat(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
@@ -260,26 +259,26 @@ func DIRCopyFiles(src, dst string) error {
 	var srcinfo os.FileInfo
 
 	if srcfd, err = os.Open(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer srcfd.Close()
 
 	if dstfd, err = os.Create(dst); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	defer dstfd.Close()
 
 	if _, err = io.Copy(dstfd, srcfd); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
 	if srcinfo, err = os.Stat(src); err != nil {
-		fmt.Println(err)
+		color.Red(err.Error())
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		return err
 	}
@@ -332,7 +331,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 		ff, err1 := os.Stat(f)
 		if err1 != nil {
 			itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
-			fmt.Println(err1)
+			color.Red(err1.Error())
 		}
 		fModTime := ff.ModTime().Unix()
 
@@ -340,13 +339,13 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 			srcFile := filepath.FromSlash(f)
 			dstBareDir := filepath.FromSlash(strings.Replace(srcFile, filepath.FromSlash(src), filepath.FromSlash(dst), -1))
 			if err = DIRCopyFiles(srcFile, dstBareDir); err != nil {
-				fmt.Println(err)
+				color.Red(err.Error())
 				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			} else {
 				NumFilesCopied++
 				// Only log when it's true
 				if logCopiedFile {
-					fmt.Println("copied file: ", ff.Name())
+					color.Magenta("copied file: " + ff.Name())
 					itrlog.Errorw("copied_file", "name", ff.Name(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				}
 			}
@@ -359,7 +358,7 @@ func WalkDIRModLatest(src, dst string, modDays int, logCopiedFile bool, ignoreFT
 func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error {
 	uncompressedStream, err := gzip.NewReader(gzipStream)
 	if err != nil {
-		fmt.Println("new reader failed")
+		color.Red("new reader failed")
 		itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 	}
 
@@ -376,9 +375,8 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error 
 			break
 		}
 		if err != nil {
-			fmt.Println(err.Error())
-			itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-			log.Fatalf(err.Error())
+			color.Red(err.Error())
+			itrlog.Fatalf("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 
 		switch header.Typeflag {
@@ -396,9 +394,8 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error 
 				extractFileTo = strings.Replace(folderPath, fnExtractRoot, fnExtract, -1)
 			}
 			if err := os.MkdirAll(filepath.FromSlash(extractFileTo), os.ModePerm); err != nil {
-				fmt.Println(err.Error())
-				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-				log.Fatalf(err.Error())
+				color.Red(err.Error())
+				itrlog.Fatalf("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 		case tar.TypeReg:
 
@@ -412,23 +409,21 @@ func ExtractTarGz(gzipStream io.Reader, src string, isLogCopiedFile bool) error 
 
 			outFile, err := os.Create(extractFileTo)
 			if err != nil {
-				fmt.Println(err.Error())
-				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-				log.Fatalf(err.Error())
+				color.Red(err.Error())
+				itrlog.Fatalf("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			if _, err := io.Copy(outFile, tarReader); err != nil {
-				fmt.Println(err.Error())
-				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-				log.Fatalf(err.Error())
+				color.Red(err.Error())
+				itrlog.Fatalf("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			// Only log when it's true
 			if isLogCopiedFile {
-				fmt.Println("extracting to: ", extractFileTo)
+				color.Magenta("extracting to: " + extractFileTo)
 				itrlog.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			defer outFile.Close()
 		default:
-			fmt.Println("unknown type:", filepath.FromSlash(header.Name))
+			color.Red("unknown type: " + filepath.FromSlash(header.Name))
 			itrlog.Errorw("unknown type", "file_type", filepath.FromSlash(header.Name), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 	}
@@ -450,7 +445,7 @@ func Unzip(src string, isLogCopiedFile bool) error {
 	for _, file := range zipReader.Reader.File {
 		zippedFile, err := file.Open()
 		if err != nil {
-			fmt.Println(err)
+			color.Red(err.Error())
 			itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 		}
 		defer zippedFile.Close()
@@ -466,9 +461,8 @@ func Unzip(src string, isLogCopiedFile bool) error {
 
 		if file.FileInfo().IsDir() {
 			if err := os.MkdirAll(filepath.FromSlash(extractedFilePath), os.ModePerm); err != nil {
-				fmt.Println(err.Error())
-				itrlog.Errorw("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
-				log.Fatalf(err.Error())
+				color.Red(err.Error())
+				itrlog.Fatalf("error", "err", err.Error(), "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 		} else {
 			folderPath := filepath.FromSlash(file.Name) //full file path
@@ -481,20 +475,20 @@ func Unzip(src string, isLogCopiedFile bool) error {
 			outputFile, err := os.OpenFile(extractFileTo, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 
 			if err != nil {
-				fmt.Println(err)
+				color.Red(err.Error())
 				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 			defer outputFile.Close()
 
 			if _, err = io.Copy(outputFile, zippedFile); err != nil {
-				fmt.Println(err)
+				color.Red(err.Error())
 				itrlog.Errorw("error", "err", err, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 				return err
 			}
 
 			// Only log when it's true
 			if isLogCopiedFile {
-				fmt.Println("extracting to: ", extractFileTo)
+				color.Magenta("extracting to: " + extractFileTo)
 				itrlog.Infow("extracting to: ", "dst", extractFileTo, "log_time", time.Now().Format(itrlog.LogTimeFormat))
 			}
 		}
@@ -553,7 +547,7 @@ func DeleteFilesWithRetention(src string, modDays int, logCopiedFile bool, ignor
 			// Only log when it's true
 			if logCopiedFile {
 				itrlog.Infow("deleted_file", "file", srcFile, "log_time", time.Now().Format(itrlog.LogTimeFormat))
-				fmt.Println("deleted file: ", srcFile)
+				color.Magenta("deleted file: " + srcFile)
 			}
 		}
 	}
