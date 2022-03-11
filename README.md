@@ -2,13 +2,13 @@
 The **kopy** package is the Go's common backup files operation, you can copy an entire directory or big files recursively with low CPU memory usage.  This **kopy** package fully implemented in [gokopy](https://github.com/itrepablik/gokopy) backup files software.
 
 # Installation
-```
+```go
 go get -u github.com/itrepablik/kopy
 ```
 
 # Usage
 To copy the **entire directory or a folder** as an example usage using the **kopy.CopyDir()** method. This will not compress the directory or a folder.
-```
+```go
 package main
 
 import (
@@ -46,7 +46,7 @@ func main() {
 ```
 
 To **copy any single file**, use the **kopy.CopyFile()** method.  This will not compress the file.
-```
+```go
 package main
 
 import (
@@ -86,7 +86,7 @@ func main() {
 ```
 
 To copy only the **latest modified files** based on the cut-off days, use the **kopy.WalkDIRModLatest()** method.  This will not compress the copied files.
-```
+```go
 package main
 
 import (
@@ -128,7 +128,7 @@ func main() {
 ```
 
 To **compress the entire directory or a folder**, use the **kopy.CompressDIR()** method.  It compresses the entire directory or a folder using the **.tar.gz** compression.
-```
+```go
 package main
 
 import (
@@ -191,7 +191,7 @@ func main() {
 ```
 
 To **decompress** the **.tar.gz** file, use the **kopy.ExtractTarGz()** method.
-```
+```go
 package main
 
 import (
@@ -232,7 +232,7 @@ func main() {
 ```
 
 To **compress any single file**, use the **kopy.ComFiles** method.  It uses the **zip** file compression.
-```
+```go
 package main
 
 import (
@@ -281,7 +281,7 @@ func main() {
 ```
 
 To **decompress** any single **zip** file, use the **kopy.Unzip** method.
-```
+```go
 package main
 
 import (
